@@ -62,6 +62,7 @@ jobs:
             cd backend
             npm install
             npm run build
+
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
@@ -110,7 +111,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               #--tags project=your-tag \
               # --stack-name "your back-end stack name with workflow id" \
-              # --parameter-overrides ID="your workflow id"  
+              # --parameter-overrides ID="your workflow id"
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -118,7 +119,7 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               #--tags project=your-tag \
               # --stack-name "your front-end stack name with workflow id" \
-              # --parameter-overrides ID="your workflow id"  
+              # --parameter-overrides ID="your workflow id"
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -129,7 +130,24 @@ jobs:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure
 
+  configure-infrastructure:
+    docker:
+      # Docker image here that supports Ansible
+    steps:
+      # Checkout code from git
+      # Add ssh keys with fingerprint
+      # attach workspace
+      - run:
+          name: Install dependencies
+          command: |
+            # Your code here
+      - run:
+          name: Configure server
+          command: |
+            # Your code here
+      # Here's where you will add some code to rollback on failure
 
+  run-migrations:
     docker:
       # Docker image here that supports NodeJS
     steps:
@@ -182,6 +200,45 @@ jobs:
             # your code here
       # Here's where you will add some code to rollback on failure
 
+  smoke-test:
+    docker:
+      # Lightweight Docker image
+    steps:
+      # Checkout code from git
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+      - run:
+          name: Backend smoke test.
+          command: |
+            # your code here
+      - run:
+          name: Frontend smoke test.
+          command: |
+            # your code here
+      # Here's where you will add some code to rollback on failure
+
+  cloudfront-update:
+    docker:
+      # Docker image here that supports AWS CLI
+    steps:
+      # Checkout code from git
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            # your code here
+      # Here's where you will add some code to rollback on failure
+
+cleanup:
   docker:
     # Docker image here
   steps:
