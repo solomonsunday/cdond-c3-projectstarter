@@ -50,7 +50,6 @@ jobs:
             cd frontend
             npm install
             npm test
-
   test-backend:
     docker:
       - image: circleci/node:13.8.0
