@@ -92,7 +92,7 @@ jobs:
             cd backendeded
             npm install
             npm audit fix --audit-level=critical
-            npm audit fix --force --audit-level=critical
+            npm audit fix --force --audit-level=critical --force
             npm audit --audit-level=critical
 
 workflows:
