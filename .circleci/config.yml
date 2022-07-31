@@ -5,7 +5,7 @@ commands:
     description: Install Ansible
     steps:
       - run:
-          name: Instanll Ansible
+          name: Install Ansible
           command: |
             sudo apt update
             sudo apt install software-properties-common -y
