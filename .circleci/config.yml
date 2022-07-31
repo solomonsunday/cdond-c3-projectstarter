@@ -1,5 +1,53 @@
 version: 2.1
 
+commands:
+  install_ansible:
+    description: Install Ansible
+    steps:
+      - run:
+          name: Instanll Ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    parameters:
+      # Add parameter here
+      Workflow_ID:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            # Your code here
+            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_ID >>
+            aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.Workflow_ID >>
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      # Add parameter here
+      Workflow_ID:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            SUCCESS=$(curl --insecure https://kvdb.io/FdEQLyzPWSP4VAfFxD48KY/migration_${CIRCLE_WORKFLOW_ID:0:7})
+
+            if(( $SUCCESS==1 ));
+            then
+              cd ~/project/backend
+              npm install
+              npm run migration:revert
+            fi
+
 jobs:
   build-frontend:
     docker:
@@ -146,6 +194,50 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure
+
+  configure-infrastructure:
+    docker:
+      # Docker image here that supports Ansible
+      - image: python:3.7-alphine3.11
+    steps:
+      # Checkout code from git
+      # Add ssh keys with fingerprint
+      # attach workspace
+      - checkout
+      - add_ssh_keys:
+          fingerprint:
+            - "94:13:18:c0:d1:c2:a0:00:fa:58:f7:94:44:6f:6b:7e"
+      - attach_workspace:
+          at: ~/
+
+      - install_ansible
+
+      - run:
+          name: Configure Server
+          command: |
+            # Your code here
+            cd .circleci/ansible
+            cat inventory.txt
+
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment
+      # Here's where you will add some code to rollback on failure
+
+  run-migrations:
+    docker:
+      # Docker image here that supports NodeJS
+    steps:
+      # Checkout code from git
+      - run:
+          name: Run migrations
+          command: |
+            # Your code here
+            exit 1
+      - run:
+          name: Send migration results to memstash
+          command: |
+            # Your code here
+            exit 1
 
 workflows:
   default:
