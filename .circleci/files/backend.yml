@@ -22,11 +22,6 @@ Resources:
           ToPort: 3030
           CidrIp: 0.0.0.0/0
 
-        - IpProticol: tcp
-          FromPort: 9100
-          Toport: 9100
-          CidrIP: 0.0.0.0/0
-
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:

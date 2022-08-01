@@ -11,7 +11,6 @@ commands:
             sudo apt install software-properties-common -y
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y
-
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
@@ -198,7 +197,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:stat
     steps:
       - checkout
       - add_ssh_keys:
@@ -207,19 +206,15 @@ jobs:
       - attach_workspace:
           at: ~/
 
-      # - install_ansible
-      - run:
-          name: install dependencies
-          command: |
-            apk add --update ansible tar gzip
-            pip install awscli
-            cat .circleci/ansible/inventory.txt
+      - install_ansible
+
       - run:
           name: Configure Server
           command: |
             cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml
+            cat inventory.txt
 
+            ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment
       # Here's where you will add some code to rollback on failure
 
@@ -228,6 +223,7 @@ jobs:
       # Docker image here that supports NodeJS
       - image: circleci/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
       - run:
           name: Run migrations
