@@ -181,7 +181,7 @@ jobs:
             cat inventory.txt
             aws ec2 describe-instances \
             --query "Reservation[*].Instances[*].PublicIpAddress" \
-            --output text --filter "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" >> inventory.txt
+            --output text --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} >> inventory.txt
             cat inventory.txt
 
             # export BACKEND_IP=$(aws ec2 describe-instances \
@@ -194,7 +194,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-       - destroy-environment
+      #  - destroy-environment
       # Here's where you will add some code to rollback on failure
 
   configure-infrastructure:
