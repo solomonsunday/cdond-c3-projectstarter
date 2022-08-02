@@ -179,16 +179,15 @@ jobs:
             # Your code here
             # cd .circleci/ansible
             # cat inventory.txt
-            aws ec2 describe-instances \
-            --query "Reservation[*].Instances[*].PublicIpAddress" \
-            --output text --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} >> ~/project/.circleci/ansible/inventory.txt
-
-
-            cat ~/project/.circleci/ansible/inventory.txt
-
             export BACKEND_IP=$(aws ec2 describe-instances \
             --query "Reservation[*].Instances[*].PublicIpAddress" \
             --output text --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7})
+
+            echo "$BACKEND_IP" >> .circleci/ansible/inventory.txt
+
+            cat .circleci/ansible/inventory.txt
+
+
             echo $(BACKEND_IP)
       - persist_to_workspace:
           root: ~/
@@ -267,7 +266,7 @@ workflows:
           filters:
             branches:
               only: [master]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
