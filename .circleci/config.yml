@@ -204,7 +204,7 @@ jobs:
           at: ~/
       - add_ssh_keys:
           fingerprints:
-            - "94:13:18:c0:d1:c2:a0:00:fa:58:f7:94:44:6f:6b:7e"
+            - "93:f8:05:5e:27:bb:99:d4:f1:73:87:d3:d6:94:5e:7a"
 
       # - install_ansible
       - run:
@@ -219,9 +219,9 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-          no_output_timeout: 30m
+          # no_output_timeout: 30m
 
-      - destroy-environment
+      # - destroy-environment
       # Here's where you will add some code to rollback on failure
 
   run-migrations:
