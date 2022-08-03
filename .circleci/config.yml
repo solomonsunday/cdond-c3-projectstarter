@@ -308,7 +308,7 @@ jobs:
             npm install
             npm run build
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0.7} --recursive
-      - distory-environment
+      - destory-environment
       - revert-migrations
 
       # Here's where you will add some code to rollback on failure
