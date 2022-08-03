@@ -266,7 +266,7 @@ jobs:
   #     - destroy-environment
   #     - revert-migrations
 
-   run-migrations:
+  run-migrations:
     docker:
       - image: circleci/node:13.8.0
     steps:
@@ -304,7 +304,7 @@ jobs:
               curl https://kvdb.io/FdEQLyzPWSP4VAfFxD48KY/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1' 
             fi
       - destroy-environment
-      - revert-migrations 
+      - revert-migrations
 
   deploy-frontend:
     docker:
