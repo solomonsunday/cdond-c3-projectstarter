@@ -243,29 +243,6 @@ jobs:
       - destroy-environment
       # Here's where you will add some code to rollback on failure
 
-  # run-migrations:
-  #   docker:
-  #     # Docker image here that supports NodeJS
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Run migrations
-  #         command: |
-  #           cd backend
-  #           npm install
-  #           npm run migrations > migrations_dump.txt
-
-  #     - run:
-  #         name: Send migration results to kvdb
-  #         command: |
-  #           if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-  #           then
-  #             curl https://kvdb.io/FdEQLyzPWSP4VAfFxD48KY/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-  #           fi
-  #     - destroy-environment
-  #     - revert-migrations
-
   run-migrations:
     docker:
       - image: circleci/node:13.8.0
@@ -356,19 +333,13 @@ jobs:
       # Docker image here that supports Ansible
       - image: cimg/base:stable
     steps:
-      # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
       - checkout
       - add_ssh_keys:
           fingerprints:
             - "93:f8:05:5e:27:bb:99:d4:f1:73:87:d3:d6:94:5e:7a"
       - attach_workspace:
           at: ~/
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      # your code here
+
       - install_nodejs
       - install_awscli
       - install_ansible
@@ -394,6 +365,100 @@ jobs:
 
       - destroy-environment
       - revert-migrations
+      # Here's where you will add some code to rollback on failure
+
+  smoke-test:
+    docker:
+      # Lightweight Docker image
+      - image: cimg/base:stable
+    steps:
+      # Checkout code from git
+      - checkout
+
+      - install_nodejs
+      - install_awscli
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+      - run:
+          name: Backend smoke test.
+          command: |
+            # your code here
+            BACKEND_PUBLIC_IP=$(aws ec2 describe instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query "Reservations[*].Instances[*].publicIpAddress" \
+              --output text)
+              export API_URL=http://${BACKEND_PUBLIC_IP}:3030
+              echo ${BACKEND_PUBLIC_IP}
+              echo backend-${CIRCLE_WORKFLOW_ID:0:7}
+              echo ${API_url}
+              if curl -s $API_URL/api/status | grep "ok"
+              then
+                exit 0
+              else
+                exit 1
+              fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+            FRONTEND_WEBSITE=http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.${AWS_DEFAULT_REGION}.amazonaws.com
+            echo $FRONTEND_WEBSITE
+            if curl -s $FRONTEND_WEBSITE | grep "Welcome"
+            then
+              exit 0
+            else
+              exit 1
+            fi
+      - destroy-environment
+      - revert-migrations
+      # Here's where you will add some code to rollback on failure
+
+
+  cloudfront-update:
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            export OLD_WORKFLOW_ID=$(aws cloudformation \
+            list-exports --query "Export[?Name==\`Workflow\`].Value" \
+            --no-pagination --output text)
+            echo "Old Workflow ID: $OLD_WORKFLOW"
+            curl https://kvdb.io//${FdEQLyzPWSP4VAfFxD48KY}/old_workflow_id -d "${OLD_WORKFLOW_ID}"
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            # your code here 
+            aws cloudformation deploy \
+            --template-file .circleci/files/cloudfront.yml \
+            --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+            --stack-name InitialStack
+      - destory-environment
+      - revert-migrations
+
+  cloudfront-update:
+    docker:
+      # Docker image here that supports AWS CLI
+    steps:
+      # Checkout code from git
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            # your code here
       # Here's where you will add some code to rollback on failure
 
 workflows:
@@ -422,3 +487,7 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
