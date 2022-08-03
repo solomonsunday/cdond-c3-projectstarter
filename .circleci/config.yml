@@ -281,7 +281,7 @@ jobs:
           at: ~/
 
       - install_nodejs
-      - install _awscli
+      - install_awscli
       - install_ansible
       - run:
           name: Install dependencies
