@@ -284,7 +284,7 @@ jobs:
       - install_awscli
       - install_ansible
       - run:
-          name: Install dependencies
+          name: Get backend url
           command: |
             # your code here
             export BACKEND_IP=$(aws ec2 describe-instances \
@@ -293,12 +293,10 @@ jobs:
             --output text
             )
             export API_URL="http://${BACKEND_IP}:3030"
-      - run:
-          name: Get backend url
-          command: |
-            # your code here
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
+            echo "API_URL = ${API_URL}"
+            echo API_URL= "http://${BACKEND_IP}:3030 >> frontend/.env"
+            cat frontend/.env
+
       - run:
           name: Deploy frontend objects
           command: |
@@ -308,6 +306,7 @@ jobs:
             npm install
             npm run build
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0.7} --recursive
+
       - destory-environment
       - revert-migrations
 
@@ -339,7 +338,6 @@ jobs:
           command: |
             # your code here
             cd backend
-
             npm i
             npm run build  
             cd ..
