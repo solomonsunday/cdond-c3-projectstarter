@@ -1,6 +1,6 @@
 export: TYPEORM_CONNECTION=postgres
 export: TYPEORM_ENTITIES=./src/moudles/domain/**/*.entity.ts 
-export: TYPEORM_HOST=udapeopledb.cpszwuc48xma.us-east-1.rds.amazonaws.com
+export: TYPEORM_HOST=udapeopledb.cswpijcayaw1.us-east-1.rds.amazonaws.com
 export: TYPEORM_PORT=5432
 export: TYPEORM_USERNAME=udapeople
 export: TYPEORM_PASSWORD=!Pass4sure
