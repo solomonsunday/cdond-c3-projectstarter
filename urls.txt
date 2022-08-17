@@ -1,2 +1,2 @@
 Public Url to GitHub repository (not private) : https://github.com/solomonsunday/cdond-c3-projectstarter/tree/fb5ec65977f73bdf76b12a7f744cf59b441c99a9
-Public URL for your S3 Bucket : https://udapeople-6e281ec.s3.amazonaws.com/index.html
+Public URL for your S3 Bucket : http://udapeople-4b09f37.s3.amazonaws.com/index.html#/employees
