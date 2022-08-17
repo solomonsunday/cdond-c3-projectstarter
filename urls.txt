@@ -1,4 +1,5 @@
 Public Url to GitHub repository (not private) : https://github.com/solomonsunday/cdond-c3-projectstarter/tree/fb5ec65977f73bdf76b12a7f744cf59b441c99a9
 Public URL for your S3 Bucket : http://udapeople-4b09f37.s3.amazonaws.com/index.html#/employees
-cloudFrount Url : http://djwwukipqa7u0.cloudfront.net/#/employees
+cloudFrount Url : http://djwwukipqa7u0.cloudfront.net
+Promstheus server: http://ec2-3-82-195-242.compute-1.amazonaws.com:9090/graph
 
